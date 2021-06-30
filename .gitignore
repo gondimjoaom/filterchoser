@@ -1,4 +1,8 @@
 env/
 __pycache__/
-static/downloads/*
-static/uploads/*
+static/downloads/*.png
+static/uploads/*.png
+static/downloads/*.jpg
+static/uploads/*.jpg
+static/downloads/*.jpeg
+static/uploads/*.jpeg
