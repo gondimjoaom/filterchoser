@@ -1,8 +1,7 @@
 import os
 from flask import Flask, request, redirect, url_for, render_template,flash
 from werkzeug.utils import secure_filename
-import numpy as np
-import cv2
+from utils.filters import *
 
 app = Flask(__name__, static_url_path="/static")
 UPLOAD_FOLDER ="static/uploads/"
@@ -19,8 +18,12 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 def allowed_file(filename):
      return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/filter', methods=['GET', 'POST'])
+def filter():
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file attached in request')
@@ -32,31 +35,18 @@ def index():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(UPLOAD_FOLDER, filename))
-            process_file(os.path.join(UPLOAD_FOLDER, filename), filename)
+            if request.form.getlist('action')[0] == 'Sobel':
+                apply_sobel_filter(filename)
+            elif request.form.getlist('action')[0] == 'Laplace':
+                apply_laplace_filter(filename)
+            elif request.form.getlist('action')[0] == 'Hist Balance':
+                apply_histogram_balance(filename)
             data={
                 "processed_img":'static/downloads/'+filename,
                 "uploaded_img":'static/uploads/'+filename
             }
-            return render_template("index.html",data=data)  
+            return render_template("index.html",data=data) 
     return render_template('index.html')
 
-def process_file(path, filename):
-    apply_sobel_filter(path, filename)
-
-def apply_sobel_filter(path, filename):
-    scale = 1
-    delta = 0
-    ddepth = cv2.CV_16S
-    image = cv2.imread(path)
-    image = cv2.GaussianBlur(image, (3,3), 0)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    grad_x = cv2.Sobel(gray, ddepth, 1, 0, ksize=3, scale=scale, delta=delta, borderType=cv2.BORDER_DEFAULT)
-    grad_y = cv2.Sobel(gray, ddepth, 0, 1, ksize=3, scale=scale, delta=delta, borderType=cv2.BORDER_DEFAULT)
-    abs_grad_x = cv2.convertScaleAbs(grad_x)
-    abs_grad_y = cv2.convertScaleAbs(grad_y)
-    grad = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
-
-    cv2.imwrite(f"{DOWNLOAD_FOLDER}{filename}",grad)
-
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

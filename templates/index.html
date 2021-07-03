@@ -37,10 +37,12 @@
   
 
    <div class="container">
-      <form method=post enctype=multipart/form-data>
-         <input type=file name=file onchange="loadFile(event)">
-         <input type=submit value=Upload class="btn btn-primary">
-      </form>
+      <form method=post enctype=multipart/form-data action='filter'>
+         <input type=file name=file>
+         <input type=submit value=Sobel name="action" class="btn btn-primary" >
+         <input type=submit value=Laplace name="action" class="btn btn-primary" >
+         <input type=submit value='Hist Balance' name="action" class="btn btn-primary" >
+       </form>
       <img id="output" alt="" width="40%" height="40%" />
    </div>
 
@@ -50,9 +52,6 @@
       <img src="{{ data.uploaded_img }}" alt="" width="480px" height="360px">   
    </div>
    {% endif %}
-
-
-   <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
 </body>
 
