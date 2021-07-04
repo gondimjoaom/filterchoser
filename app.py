@@ -35,11 +35,11 @@ def filter():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(UPLOAD_FOLDER, filename))
-            if request.form.getlist('action')[0] == 'Sobel':
+            if request.form['action'] == 'Sobel':
                 apply_sobel_filter(filename)
-            elif request.form.getlist('action')[0] == 'Laplace':
+            elif request.form['action'] == 'Laplace':
                 apply_laplace_filter(filename)
-            elif request.form.getlist('action')[0] == 'Hist Balance':
+            elif request.form['action'] == 'Hist Balance':
                 apply_histogram_balance(filename)
             data={
                 "processed_img":'static/downloads/'+filename,
